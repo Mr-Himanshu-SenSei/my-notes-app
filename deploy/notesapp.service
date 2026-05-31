@@ -1,0 +1,21 @@
+[Unit]
+Description=Notes App (FastAPI + Gunicorn)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/my-notes-app
+EnvironmentFile=/home/ubuntu/my-notes-app/.env
+ExecStart=/home/ubuntu/my-notes-app/venv/bin/gunicorn main:app \
+    --workers 2 \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --bind 127.0.0.1:8000 \
+    --access-logfile /var/log/notesapp/access.log \
+    --error-logfile /var/log/notesapp/error.log
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -8,18 +10,22 @@ from models import User, Note
 from schemas import UserCreate, UserResponse, Token, NoteCreate, NoteUpdate, NoteResponse
 from auth import hash_password, verify_password, create_access_token, get_current_user
 
+# ── Resolve paths relative to this file ───────────────
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+
 # ── Create tables ─────────────────────────────────────
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Notes App", version="1.0.0")
 
 # ── Serve static files ────────────────────────────────
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @app.get("/")
 def serve_index():
-    return FileResponse("static/index.html")
+    return FileResponse(str(STATIC_DIR / "index.html"))
 
 
 # ══════════════════════════════════════════════════════
